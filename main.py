@@ -221,7 +221,7 @@ async def start(update, context):
         await send_force_join_msg(update, context, context.application)
         return ConversationHandler.END
 
-    if update.effective_user.username == ADMIN_USERNAMES:
+    if update.effective_user.username in ADMIN_USERNAMES:
         keyboard = [
             [InlineKeyboardButton("📥 Input Numbers", callback_data='input_start')], 
             [InlineKeyboardButton("🗑️ Delete Options", callback_data='del_menu')],
