@@ -527,8 +527,8 @@ if __name__ == '__main__':
     
     while True:
         try:
-        application.run_polling()
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        time.sleep(5)
+            application.run_polling()
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            time.sleep(5)
