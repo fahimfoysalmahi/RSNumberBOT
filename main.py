@@ -305,7 +305,7 @@ async def export_expired_callback(update, context):
 async def service_callback(update, context):
     query = update.callback_query
     user_id = update.effective_user.id
-    if update.effective_user.username not in ADMIN_USERNAME and not await is_user_joined(context.application, user_id):
+    if update.effective_user.username not in ADMIN_USERNAMES and not await is_user_joined(context.application, user_id):
         await send_force_join_msg(update, context, context.application, is_callback=True)
         return
     service = query.data.split('_')[1]
@@ -322,7 +322,7 @@ async def service_callback(update, context):
 async def country_callback(update, context):
     query = update.callback_query
     user_id = update.effective_user.id
-    if update.effective_user.username != ADMIN_USERNAME and not await is_user_joined(context.application, user_id):
+    if update.effective_user.username not in ADMIN_USERNAMES and not await is_user_joined(context.application, user_id):
         await send_force_join_msg(update, context, context.application, is_callback=True)
         return
 
