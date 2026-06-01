@@ -526,9 +526,9 @@ if __name__ == '__main__':
     application.add_handler(CallbackQueryHandler(export_expired_callback, pattern='export_expired'))
     
     while True:
-        try:
-            application.run_polling()
-        except NetworkError:
-            time.sleep(5)
-        except Exception as e:
-            time.sleep(5)
+    try:
+        application.run_polling()
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        time.sleep(5)
