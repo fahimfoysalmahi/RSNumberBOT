@@ -154,7 +154,7 @@ async def check_sms_loop(application):
                                     data = await response.json()
                                     if data and isinstance(data, list) and "message" in data[0]:
                                         msg = data[0]["message"]
-                                        otp_match = re.search(r'(\d{3}-\d{3}|\d{6})', msg)
+                                        otp_match = re.search(r'\b\d{4,8}\b', msg)
                                         if otp_match:
                                             raw_otp = otp_match.group(0)
                                             otp = raw_otp.replace('-', '')
@@ -326,7 +326,7 @@ async def country_callback(update, context):
         return
 
     data = query.data.split('_')
-    service, country = data[1], data[2]
+    _, service, country = query.data.split('_', 2)
     
     cursor.execute('SELECT id, number FROM numbers WHERE service=? AND country=? AND status="Available" LIMIT 1', (service, country))
     row = cursor.fetchone()
@@ -489,18 +489,31 @@ async def menu_start_callback(update, context):
         await send_force_join_msg(update, context, context.application, is_callback=True)
         return
     await show_main_menu(update, context, query=query)
-    
+
 if __name__ == '__main__':
-    # রেন্ডার সার্ভারের জন্য ইভেন্ট লুপ ফিক্স
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    
     application = ApplicationBuilder().token(TOKEN).build()
-    
-    # ব্যাকগ্রাউন্ড টাস্ক চালু করা
+    loop = asyncio.get_event_loop()
     loop.create_task(check_sms_loop(application))
     
-    # হ্যান্ডলারগুলো যোগ করা (তোমার কোডের হ্যান্ডলারগুলো এখানে থাকবে)
+    conv = ConversationHandler(
+        entry_points=[CallbackQueryHandler(input_start, pattern='input_start')],
+        states={
+            SERVICE: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, get_service),
+                CallbackQueryHandler(cancel_input, pattern='cancel_input')
+            ],
+            COUNTRY: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, get_country),
+                CallbackQueryHandler(cancel_input, pattern='cancel_input')
+            ],
+            NUMBERS: [
+                MessageHandler((filters.TEXT | filters.Document.ALL) & ~filters.COMMAND, get_numbers),
+                CallbackQueryHandler(cancel_input, pattern='cancel_input')
+            ]
+        }, 
+        fallbacks=[CommandHandler("start", start), CallbackQueryHandler(cancel_input, pattern='cancel_input')]
+    )
+    
     application.add_handler(conv)
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(verify_callback, pattern='verify_join')) 
@@ -512,8 +525,4 @@ if __name__ == '__main__':
     application.add_handler(CallbackQueryHandler(menu_start_callback, pattern='menu_start'))
     application.add_handler(CallbackQueryHandler(export_expired_callback, pattern='export_expired'))
     
-    # বট রান করা
-    try:
-        application.run_polling()
-    except Exception as e:
-        print(f"Error: {e}")
+    application.run_polling()
