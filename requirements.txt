@@ -1,0 +1,6 @@
+python-telegram-bot
+pandas
+phonenumbers
+aiohttp
+requests
+openpyxl
