@@ -491,10 +491,14 @@ async def menu_start_callback(update, context):
     await show_main_menu(update, context, query=query)
 
 if __name__ == '__main__':
+    # ১. অ্যাপ্লিকেশন বিল্ড করো
     application = ApplicationBuilder().token(TOKEN).build()
-    loop = asyncio.get_event_loop()
-    loop.create_task(check_sms_loop(application))
     
+    # ২. লুপ সেটআপ করো
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    
+    # ৩. হ্যান্ডলার আগে ডিফাইন করো
     conv = ConversationHandler(
         entry_points=[CallbackQueryHandler(input_start, pattern='input_start')],
         states={
@@ -514,6 +518,7 @@ if __name__ == '__main__':
         fallbacks=[CommandHandler("start", start), CallbackQueryHandler(cancel_input, pattern='cancel_input')]
     )
     
+    # ৪. এরপর হ্যান্ডলারগুলো যোগ করো
     application.add_handler(conv)
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(verify_callback, pattern='verify_join')) 
@@ -525,10 +530,13 @@ if __name__ == '__main__':
     application.add_handler(CallbackQueryHandler(menu_start_callback, pattern='menu_start'))
     application.add_handler(CallbackQueryHandler(export_expired_callback, pattern='export_expired'))
     
+    # ৫. ব্যাকগ্রাউন্ড টাস্ক এবং পোলিং
+    loop.create_task(check_sms_loop(application))
+    
     while True:
         try:
             application.run_polling()
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             time.sleep(5)
+  
+  
