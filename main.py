@@ -12,7 +12,8 @@ from telegram.error import NetworkError
 
 # Configuration
 TOKEN = '8816168770:AAEQpphmhhPXEBPwQTcBT2Gl4kfw8IpX_F4'
-ADMIN_USERNAME = 'foysal92700'
+# এটি পরিবর্তন করো
+ADMIN_USERNAMES = ['foysal92700', 'RS_OWNERR'] 
 API_TOKEN = 'RldRSkpBUzRRhgodqV4OGSEGUjl9ikGFDWI-LSYWJdGJFbFNGYI5kiA=='
 API_URL = "http://147.135.212.197/crapi/st/viewstats" 
 
@@ -83,7 +84,7 @@ def get_flag_by_country_name(country_name):
     return "🚩"
 
 async def is_user_joined(application, user_id):
-    if str(user_id) == str(ADMIN_USERNAME): 
+    if str(user_id) == str(ADMIN_USERNAMES): 
         return True
     try:
         member_ch = await application.bot.get_chat_member(chat_id=CHANNEL_ID, user_id=user_id)
