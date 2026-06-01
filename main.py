@@ -217,7 +217,7 @@ async def start(update, context):
     user_id = update.effective_user.id
     context.user_data.clear()
     
-    if update.effective_user.username != ADMIN_USERNAMES and not await is_user_joined(context.application, user_id):
+    if update.effective_user.username not in  ADMIN_USERNAMES and not await is_user_joined(context.application, user_id):
         await send_force_join_msg(update, context, context.application)
         return ConversationHandler.END
 
